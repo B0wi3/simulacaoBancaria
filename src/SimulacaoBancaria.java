@@ -1,69 +1,89 @@
 import java.util.Scanner;
 
 public class SimulacaoBancaria {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        double saldo = 0;
-        System.out.println("Escolha uma opção: \n1 - Depositar; \n2 - Sacar; \n3 - Consultar saldo; \n4 - Encerrar");
-        // Loop infinito para manter o programa em execução até que o usuário decida sair
-        boolean executando = true;
-        while (executando) {
 
-            int opcao = scanner.nextInt();
+        System.out.println("Enter your account number (8 digits): ");
+        String accNumber = validateAccNumber(scanner);
+        System.out.println("\nAccount " + accNumber + " registered.");
 
-            switch (opcao) {
+        double balance = 0;
+
+        System.out.println("\nChoose an option: \n1 - Deposit \n2 - Withdraw \n3 - Check balance \n4 - Exit");
+
+        boolean running = true;
+        while (running) {
+            int option = scanner.nextInt();
+
+            switch(option) {
                 case 1:
-                    saldo = depositar(saldo);
+                    balance = deposit(balance, scanner);
                     break;
 
                 case 2:
-                    saldo = sacar(saldo);
+                    balance = withdraw(balance, scanner);
                     break;
 
                 case 3:
-                    consultarSaldo(saldo);
+                    System.out.println("Current balance: " + balance);
                     break;
 
                 case 4:
-                    System.out.println("Encerrando operação...");
-                    executando = false;
+                    System.out.println("Exiting... ");
+                    running = false;
                     break;
 
                 default:
-                    System.out.println("Opção inválida. Tente novamente: ");
+                    System.out.println("Please, enter a valid option: ");
             }
         }
     }
 
-    static double depositar(double saldoAtual) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Quanto deseja depositar? ");
-        double deposito = scanner.nextDouble();
-        double novoSaldo = saldoAtual + deposito;
-
-        System.out.println("Saldo atual: " + novoSaldo);
-        return novoSaldo;
-    }
-
-    static double sacar(double saldoAtual) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Quanto deseja sacar? ");
-        double saque = scanner.nextDouble();
-
-        if (saque > saldoAtual) {
-            System.out.println("Saldo insuficiente.");
-            return saldoAtual;
-        } else {
-            double novoSaldo = saldoAtual - saque;
-            System.out.println("Saque realizado com sucesso. Novo saldo: " + novoSaldo);
-            return novoSaldo;
+    public static String validateAccNumber(Scanner scanner) {
+        String accNumber;
+        while (true) {
+            accNumber = scanner.nextLine();
+            if (accNumber.length() != 8) {
+                System.out.println("Incorrect format, make sure you are entering 8 digits: ");
+            } else {
+                break;
+            }
         }
+        return accNumber;
     }
 
-    static void consultarSaldo(double saldoAtual) {
-        System.out.println("Saldo atual: " + saldoAtual);
+    public static double deposit (Double currBalance, Scanner scanner) {
+        System.out.println("Enter the amount you wish to deposit: ");
+        double deposit = scanner.nextDouble();
+
+        currBalance += deposit;
+        System.out.println("New balance: " + currBalance);
+
+        return currBalance;
+    }
+
+    public static double withdraw (Double currBalance, Scanner scanner) {
+        try {
+            System.out.println("Enter the amount you wish to withdraw: ");
+            double withdraw = scanner.nextDouble();
+
+            if (withdraw > currBalance) {
+                throw new invalidAmountException("Not enough balance available. ");
+            } else {
+                currBalance -= withdraw;
+                System.out.println("New balance: " + currBalance);
+            }
+        } catch (invalidAmountException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return currBalance;
+    }
+}
+
+class invalidAmountException extends Exception {
+    public invalidAmountException(String message) {
+        super(message);
     }
 }
